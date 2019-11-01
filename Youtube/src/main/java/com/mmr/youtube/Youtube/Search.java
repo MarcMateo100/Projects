@@ -105,8 +105,8 @@ public class Search {
        */
       search.setType("video");
       search.setOrder("viewCount");
-      search.setLocation("41.3887901,2.1589899");
-      search.setLocationRadius("50km");
+     // search.setLocation("41.3887901,2.1589899");
+     // search.setLocationRadius("50km");
       
       /*
        * This method reduces the info returned to only the fields we need and makes calls more
@@ -117,6 +117,21 @@ public class Search {
       SearchListResponse searchResponse = search.execute();
 
       List<SearchResult> searchResultList = searchResponse.getItems();
+      
+    //Create URLs      
+      for (int i=0; i<25; i++) {
+    	  
+    	  SearchResult result= searchResultList.get(i);
+            
+    	  ResourceId id1=result.getId();
+      
+    	  id1.setVideoId(" https://www.youtube.com/watch?v=" + result.getId().getVideoId());
+          
+    	  result.setId(id1);
+       
+    	  searchResultList.get(i).setId(id1);
+      }
+      //End
 
       if (searchResultList != null) {
         prettyPrint(searchResultList.iterator(), queryTerm);
