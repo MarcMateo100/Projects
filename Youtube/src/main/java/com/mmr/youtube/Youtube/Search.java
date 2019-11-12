@@ -21,6 +21,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
@@ -34,6 +35,8 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+
+import java.sql.*;
 
 /**
  * Prints a list of videos based on a search term.
@@ -105,8 +108,15 @@ public class Search {
        */
       search.setType("video");
       search.setOrder("viewCount");
+      //DateTime dt=DateTime.parseRfc3339("2018-01-01T00:00:00-00:00");
+      //search.setPublishedAfter(dt);
      // search.setLocation("41.3887901,2.1589899");
-     // search.setLocationRadius("50km");
+      //search.setLocation("139.6917100,35.68950002");
+      //SEVILLAsearch.setLocation("37.3754865,-6.0250983");
+      //search.setLocation("43.4628005,-7.062646");
+      //search.setLocationRadius("100km");
+      //search.setRelevanceLanguage("es");
+      search.setRegionCode("ES");
       
       /*
        * This method reduces the info returned to only the fields we need and makes calls more
@@ -197,6 +207,61 @@ public class Search {
         System.out.println(" Thumbnail: " + thumbnail.getUrl());
         System.out.println("\n-------------------------------------------------------------\n");
       }
-    }
-  }
+      
+      //Insert BD
+		try {
+			
+			Class.forName("org.postgresql.Driver");
+			
+			} catch (ClassNotFoundException e) {
+			
+			System.out.println("Where is your PostgreSQL JDBC Driver? " + "Include in your library path!");
+			e.printStackTrace();
+			return;
+			
+			}
+		
+			System.out.println("PostgreSQL JDBC Driver Registered!");
+			
+			Connection connection = null;
+		
+			try {
+			
+			connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres",
+			"PostgresAdmin");
+			
+			System.out.println("PostgreSQL Connected!" + connection);
+			
+			} catch (SQLException e) {
+			
+			System.out.println("Connection Failed! Check output console");
+			e.printStackTrace();
+			return;
+			
+			}
+		
+						
+			try {
+						
+			Statement sql = connection.createStatement();
+			String videos= rId.getVideoId();
+			String queryI = "INSERT INTO YOUTUBE Values ( 'proba', '"+ videos +"', CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)"; 
+		
+			if (connection != null) {
+			
+				System.out.println("Successfully added" + queryI);
+				sql.executeUpdate(queryI);
+				sql.close();
+				System.out.println("Successfully added");
+				
+			} 
+			}catch (SQLException e) {
+				System.out.println("Got an exception! "); 
+	            System.out.println(e.getMessage());
+			}
+		
+		}
+      
+    } 
+
 }
